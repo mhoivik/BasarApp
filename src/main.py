@@ -1,7 +1,8 @@
 import random
-import tkinter as tk
-from PIL import Image, ImageTk
-import basarui
+import tkinter as tk 
+from PIL import Image, ImageTk 
+import basarui 
+
 # init
 global trekkingHarStartet
 trekkingHarStartet= False
@@ -15,16 +16,14 @@ root.columnconfigure(0, weight=1)
 root.resizable(False, False)
 logo = tk.PhotoImage(file="../img/mortennobg.png")
 root.iconphoto(False, logo)
-# banner???
 
 
 
-def Trekk(event=0):
+def Trekk(event=0): # event fra tkinter.bind("<Return>", Trekk)
     minst = entryMinsteTall.get()
     størst = entryStørsteTall.get()
     randomNumber = random.randint(int(minst), int(størst))
     basarui.ByttTall(randomNumber)
-
 
 def StartTrekking(nyttImg):
     global trekkingHarStartet
@@ -63,7 +62,6 @@ if not trekkingHarStartet:
     startTrekking.grid(row=10, column=0, columnspan=2, padx=20, pady=20)
 
 root.bind("<Return>", Trekk)
-
 
 
 root.mainloop()

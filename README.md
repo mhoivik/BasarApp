@@ -8,13 +8,17 @@ Dette er en enkel basarapp i Python.
 - Tkinter
 </p>
 
-<h5>PYTHON: </h5>
+<h4>PYTHON: </h4>
 <p>Les dokumentasjon: https://www.python.org/
-<h5>PIL/Tkinter: </h5>
+<h4>PIL/Tkinter: </h4>
 Hvis Python er installert rett, er det bare å kjøre denne kommandoen i terminalen
 
 ```bash
 pip install pillow tk
 ```
-<h5>Kjør programmet</h5>
+<h3>Kjør programmet:</h3>
 <p>Gå til <b>src</b> og kjør <b>main.py</b></p>
+
+
+<h3>Eksempel:</h3>
+![](img/docs1.png)

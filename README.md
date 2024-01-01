@@ -21,4 +21,4 @@ pip install pillow tk
 
 
 <h3>Eksempel:</h3>
-![](img/docs1.png)
+<img src="img/docs1">

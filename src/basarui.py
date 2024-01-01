@@ -16,4 +16,7 @@ def LagNyttVindu():
 
 def ByttTall(nummer):
     global vinnerTall
-    vinnerTall.config(text=nummer) 
+    try:
+        vinnerTall.config(text=nummer) 
+    except:
+        return

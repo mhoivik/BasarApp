@@ -19,7 +19,7 @@ root.iconphoto(False, logo)
 
 
 
-def Trekk():
+def Trekk(event=0):
     minst = entryMinsteTall.get()
     størst = entryStørsteTall.get()
     randomNumber = random.randint(int(minst), int(størst))
@@ -61,6 +61,9 @@ if not trekkingHarStartet:
     startTrekkingImg = ImageTk.PhotoImage(resizeTempImg)
     startTrekking = tk.Button(root, image=startTrekkingImg, border=0, highlightthickness=0, bg="#001116", activebackground="#001116", command=lambda: StartTrekking(startTrekkingImgNy))
     startTrekking.grid(row=10, column=0, columnspan=2, padx=20, pady=20)
+
+root.bind("<Return>", Trekk)
+
 
 
 root.mainloop()

@@ -38,6 +38,9 @@ int main(void)
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
+        ImGui::SetNextWindowPos();
+        ImGui::SetNextWindowSize();
+
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
@@ -50,7 +53,6 @@ int main(void)
         ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         glfwSwapBuffers(window);
-
         /* Poll for and process events */
         glfwPollEvents();
     }

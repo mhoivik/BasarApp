@@ -1,23 +1,37 @@
-#include "imgui/imgui.h"
-#include "imgui/backends/imgui_impl_opengl3.h"
+#include <GLFW/glfw3.h>
 
-// ... (other includes)
+int main(void)
+{
+    GLFWwindow* window;
 
-int main() {
-    // ... (initialize your application)
+    /* Initialize the library */
+    if (!glfwInit())
+        return -1;
 
-    // Setup ImGui context
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
+    /* Create a windowed mode window and its OpenGL context */
+    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    if (!window)
+    {
+        glfwTerminate();
+        return -1;
+    }
 
-    // Initialize ImGui backend for OpenGL
-    ImGui_ImplOpenGL3_Init("#version 330 core");
+    /* Make the window's context current */
+    glfwMakeContextCurrent(window);
 
-    // ... (your main loop)
+    /* Loop until the user closes the window */
+    while (!glfwWindowShouldClose(window))
+    {
+        /* Render here */
+        glClear(GL_COLOR_BUFFER_BIT);
 
-    // Cleanup
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui::DestroyContext();
+        /* Swap front and back buffers */
+        glfwSwapBuffers(window);
 
+        /* Poll for and process events */
+        glfwPollEvents();
+    }
+
+    glfwTerminate();
     return 0;
 }

@@ -9,16 +9,13 @@ RELEASE = -o bin/release/main -Wall -Wextra -Ofast
 DIST = -o bin/dist/main -DNDEBUG -Ofast -s
 
 debug:
-	$(CXX) $(FILES) $(SRC) $(DEBUG) $(INCLUDE) $(LIBS)
-	./bin/debug/main
+	$(CXX) $(SRC) $(FILES) $(DEBUG) $(INCLUDE) $(LIBS) && .\bin\debug\main.exe
 
 release:
-	$(CXX) $(SRC) $(INCLUDE) $(FILES) $(RELEASE) $(INCLUDE) $(LIBS)
-	./bin/release/main
+	$(CXX) $(SRC) $(FILES) $(RELEASE) $(INCLUDE) $(LIBS) && .\bin\release\main.exe
 
 dist:
-	$(CXX) $(SRC) $(INCLUDE) $(FILES) $(DIST) $(INCLUDE) $(LIBS)
-	./bin/dist/main
+	$(CXX) $(SRC) $(FILES) $(DIST) $(INCLUDE) $(LIBS) && .\bin\dist\main.exe
 
 clean:
 	rm -rf bin/debug/main

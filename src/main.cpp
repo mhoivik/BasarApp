@@ -3,16 +3,23 @@
 #include "imgui_impl_opengl3.h"
 #include <GLFW/glfw3.h>
 
+void ImguiSetup(GLFWwindow* window) {
+    IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	ImGui::StyleColorsDark();
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init("#version 330");
+}
+
+
 int main(void)
 {
-    GLFWwindow* window;
-
-    /* Initialize the library */
     if (!glfwInit())
         return -1;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Utøy Bedehus Basar App", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(640, 480, "Utøy Bedehus Basar App", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -21,13 +28,8 @@ int main(void)
 
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
-
-    IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	ImGui::StyleColorsDark();
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init("#version 330");
+    
+    ImguiSetup(window);
 
     bool drawTriangle = true;
 	float size = 1.0f;
@@ -38,9 +40,6 @@ int main(void)
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
-        ImGui::SetNextWindowPos();
-        ImGui::SetNextWindowSize();
-
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
@@ -50,7 +49,10 @@ int main(void)
 		ImGui::SliderFloat("Size", &size, 0.5f, 2.0f);
 		ImGui::ColorEdit4("Color", color);
 		ImGui::End();
+
+
         ImGui::Render();
+
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         glfwSwapBuffers(window);
         /* Poll for and process events */

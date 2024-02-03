@@ -1,7 +1,7 @@
 CXX = g++
 FILES = include/imgui/imgui.cpp include/imgui/imgui.h  include/imgui/imgui_demo.cpp include/imgui/imgui_draw.cpp include/imgui/imgui_tables.cpp include/imgui/imgui_widgets.cpp include/imgui/backends/imgui_impl_glfw.cpp include/imgui/backends/imgui_impl_opengl3.cpp
 INCLUDE = -Iinclude -Iinclude/imgui -Iinclude/imgui/backends
-LIBS = -Llibs -lglfw3 -lopengl32 -lgdi32
+LIBS = -Llibs -lglew32s -lglfw3 -lopengl32 -lgdi32
 SRC = src/main.cpp
 
 DEBUG = -o bin/debug/main -Wall -Wextra -g

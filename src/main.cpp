@@ -1,9 +1,12 @@
+#include <iostream>
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#define GLEW_STATIC
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-void ImguiSetup(GLFWwindow* window) {
+void SetupImGui(GLFWwindow* window) {
     IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -28,11 +31,14 @@ int main(void)
 
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
+    if (glewInit() != GLEW_OK) {
+        std::cerr << "init of glew failed!" << std::endl;
+        glfwTerminate();
+        return -1;
+    }
     
-    ImguiSetup(window);
+    SetupImGui(window);
 
-    bool drawTriangle = true;
-	float size = 1.0f;
 	float color[4] = { 0.8f, 0.3f, 0.02f, 1.0f };
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -40,13 +46,20 @@ int main(void)
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
+        glColor4f(color[0], color[1], color[2], color[3]);
+
+        glBegin(GL_QUADS);
+        glVertex2f(-1.0f, -1.0f);
+        glVertex2f(1.0f, -1.0f);
+        glVertex2f(1.0f, 1.0f);
+        glVertex2f(-1.0f, 1.0f);
+        glEnd();
+        
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        ImGui::Begin("My name is window, ImGUI window");
-		ImGui::Text("Hello there adventurer!");
-		ImGui::Checkbox("Draw Triangle", &drawTriangle);
-		ImGui::SliderFloat("Size", &size, 0.5f, 2.0f);
+
+        ImGui::Begin("Trekker teknikkerbox");
 		ImGui::ColorEdit4("Color", color);
 		ImGui::End();
 

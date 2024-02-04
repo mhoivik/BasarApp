@@ -5,6 +5,7 @@
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include "font.h"
 
 void SetupImGui(GLFWwindow* window) {
     IMGUI_CHECKVERSION();
@@ -19,6 +20,8 @@ void SetupImGui(GLFWwindow* window) {
     style.ScrollbarRounding = 0.0f;
     style.ChildRounding = 0.0f;
     style.GrabRounding = 0.0f;
+
+    io.Fonts->AddFontFromMemoryTTF(JetBrainsFont,sizeof(JetBrainsFont), 16.0f);
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");

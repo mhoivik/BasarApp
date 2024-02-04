@@ -8,13 +8,35 @@
 
 void SetupImGui(GLFWwindow* window) {
     IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	ImGui::StyleColorsDark();
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init("#version 330");
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui::StyleColorsDark();
+
+    // Modify ImGui style
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.WindowRounding = 0.0f;
+    style.FrameRounding = 0.0f;
+    style.ScrollbarRounding = 0.0f;
+    style.ChildRounding = 0.0f;
+    style.GrabRounding = 0.0f;
+
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 }
 
+bool ButtonCenteredOnLine(const char* label, float alignment = 0.5f)
+{
+    ImGuiStyle& style = ImGui::GetStyle();
+
+    float size = ImGui::CalcTextSize(label).x + style.FramePadding.x * 2.0f;
+    float avail = ImGui::GetContentRegionAvail().x;
+float off = (avail - size) * alignment;
+    if (off > 0.0f)
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+
+    return ImGui::Button(label);
+}
 
 int main(void)
 {
@@ -59,12 +81,21 @@ int main(void)
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::Begin("Trekker teknikkerbox");
-		ImGui::ColorEdit4("Color", color);
-		ImGui::End();
+        ImGuiViewport* viewport = ImGui::GetMainViewport();
+        ImGui::SetNextWindowPos(viewport->Pos);
+        ImGui::SetNextWindowSize(viewport->Size);
+
+
+        ImGui::Begin("Trekker teknikkerbox", nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+        ButtonCenteredOnLine("Hello");
+        ImGui::ColorEdit4("Color", color);
+        float fps = ImGui::GetIO().Framerate;
+        ImGui::Text("FPS: %.1f", fps);
+        ImGui::End();
 
 
         ImGui::Render();
+        glViewport(0, 0, (int)viewport->Size.x, (int)viewport->Size.y);
 
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         glfwSwapBuffers(window);

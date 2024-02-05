@@ -64,6 +64,7 @@ int main(void)
     
     SetupImGui(window);
 
+    int range = 1000;
 	float color[4] = { 0.8f, 0.3f, 0.02f, 1.0f };
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -90,8 +91,11 @@ int main(void)
 
 
         ImGui::Begin("Trekker teknikkerbox", nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
-        ButtonCenteredOnLine("Hello");
-        ImGui::ColorEdit4("Color", color);
+        ImGui::InputInt(" ", &range, NULL, NULL);
+        ImGui::ColorEdit4("Color", color, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoOptions);
+        ImVec4 color = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);  // Red color
+        if (ImGui::ColorButton("MyColorButton", color, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoPicker | ImGuiColorEditFlags_NoInputs, ImVec2(40, 40)))
+            std::cout << "got hit" << std::endl;
         float fps = ImGui::GetIO().Framerate;
         ImGui::Text("FPS: %.1f", fps);
         ImGui::End();

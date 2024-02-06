@@ -28,6 +28,17 @@ void SetupImGui(GLFWwindow* window) {
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 }
 
+typedef struct {
+    float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+} Colors;
+
+void SwitchColor(float r, float g, float b, float alfa, int arrayIndex, Colors colors[12]) {
+    colors[arrayIndex].color[0] = r;
+    colors[arrayIndex].color[1] = g;
+    colors[arrayIndex].color[2] = b;
+    colors[arrayIndex].color[3] = alfa;
+}
+
 bool ButtonCenteredOnLine(const char* label, float alignment = 0.5f)
 {
     ImGuiStyle& style = ImGui::GetStyle();
@@ -43,10 +54,10 @@ bool ButtonCenteredOnLine(const char* label, float alignment = 0.5f)
 
 int main(void)
 {
+    Colors colors[12];
     if (!glfwInit())
         return -1;
 
-    /* Create a windowed mode window and its OpenGL context */
     GLFWwindow* window = glfwCreateWindow(640, 480, "Utøy Bedehus Basar App", NULL, NULL);
     if (!window)
     {
@@ -54,7 +65,6 @@ int main(void)
         return -1;
     }
 
-    /* Make the window's context current */
     glfwMakeContextCurrent(window);
     if (glewInit() != GLEW_OK) {
         std::cerr << "init of glew failed!" << std::endl;
@@ -63,25 +73,21 @@ int main(void)
     }
     
     SetupImGui(window);
-
+    bool started = false;
     int range = 1000;
-	float color[4] = { 0.914f, 0.769f, 0.416f, 1.0f };
-	float seccolor[192]; // 12 * 4 * sizeof(float) = 192
-
-    for (int i = 0; i < sizeof(seccolor) / sizeof(seccolor[0]); i++) {
-        if ((i % 4) == 0) {
-            seccolor[i] = 1.0f;
-        }
-        else {
-            seccolor[i] = 0.0f;
-        }
-    }
-
+    // 8 farger: hvit, svart, lilla, gul, rød, blå, grønn, brun.
+    SwitchColor(1.0f, 1.0f, 1.0f, 1.0f, 0, colors); // hvit/blank
+    SwitchColor(0.0f, 0.0f, 0.0f, 0.0f, 1, colors); // svart(Her har vi et problem...)
+    SwitchColor(1.0f, 0.0f, 1.0f, 1.0f, 2, colors); // lilla
+    SwitchColor(1.0f, 1.0f, 0.0f, 1.0f, 3, colors); // gul
+    SwitchColor(1.0f, 0.0f, 0.0f, 1.0f, 4, colors); // rød
+    SwitchColor(0.0f, 0.0f, 1.0f, 1.0f, 5, colors); // blå
+    SwitchColor(0.0f, 1.0f, 0.0f, 1.0f, 6, colors); // grønn
+    SwitchColor(0.7f, 0.5f, 0.0f, 1.0f, 7, colors); // brun
     int numberOfColors = 1;
 
     while (!glfwWindowShouldClose(window))
     {
-        /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
         ImGui_ImplOpenGL3_NewFrame();
@@ -98,9 +104,13 @@ int main(void)
 
         ImGui::InputInt(" ", &range, NULL, NULL);
         ImGui::SliderInt("Antall Farger: ", &numberOfColors, 1, 12);
-        ImGui::ColorEdit4("Color", color, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoOptions);
+        for (int i = 0; i < numberOfColors; ++i) {
+            ImGui::ColorEdit4(("Color " + std::to_string(i+1)).c_str(), colors[i].color, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoOptions);
+        }
         float fps = ImGui::GetIO().Framerate;
         ImGui::Text("FPS: %.1f", fps);
+        if (ImGui::Button("START"))
+            started = true;
 
         ImGui::End();
 
@@ -109,7 +119,6 @@ int main(void)
 
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         glfwSwapBuffers(window);
-        /* Poll for and process events */
         glfwPollEvents();
     }
 

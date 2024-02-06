@@ -34,7 +34,7 @@ bool ButtonCenteredOnLine(const char* label, float alignment = 0.5f)
 
     float size = ImGui::CalcTextSize(label).x + style.FramePadding.x * 2.0f;
     float avail = ImGui::GetContentRegionAvail().x;
-float off = (avail - size) * alignment;
+    float off = (avail - size) * alignment;
     if (off > 0.0f)
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 
@@ -65,22 +65,25 @@ int main(void)
     SetupImGui(window);
 
     int range = 1000;
-	float color[4] = { 0.8f, 0.3f, 0.02f, 1.0f };
-    /* Loop until the user closes the window */
+	float color[4] = { 0.914f, 0.769f, 0.416f, 1.0f };
+	float seccolor[192]; // 12 * 4 * sizeof(float) = 192
+
+    for (int i = 0; i < sizeof(seccolor) / sizeof(seccolor[0]); i++) {
+        if ((i % 4) == 0) {
+            seccolor[i] = 1.0f;
+        }
+        else {
+            seccolor[i] = 0.0f;
+        }
+    }
+
+    int numberOfColors = 1;
+
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glColor4f(color[0], color[1], color[2], color[3]);
-
-        glBegin(GL_QUADS);
-        glVertex2f(-1.0f, -1.0f);
-        glVertex2f(1.0f, -1.0f);
-        glVertex2f(1.0f, 1.0f);
-        glVertex2f(-1.0f, 1.0f);
-        glEnd();
-        
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
@@ -89,17 +92,17 @@ int main(void)
         ImGui::SetNextWindowPos(viewport->Pos);
         ImGui::SetNextWindowSize(viewport->Size);
 
+        // ImGui::ShowStyleEditor();
 
-        ImGui::Begin("Trekker teknikkerbox", nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+        ImGui::Begin("SetupGUI", nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+
         ImGui::InputInt(" ", &range, NULL, NULL);
+        ImGui::SliderInt("Antall Farger: ", &numberOfColors, 1, 12);
         ImGui::ColorEdit4("Color", color, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoOptions);
-        ImVec4 color = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);  // Red color
-        if (ImGui::ColorButton("MyColorButton", color, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoPicker | ImGuiColorEditFlags_NoInputs, ImVec2(40, 40)))
-            std::cout << "got hit" << std::endl;
         float fps = ImGui::GetIO().Framerate;
         ImGui::Text("FPS: %.1f", fps);
-        ImGui::End();
 
+        ImGui::End();
 
         ImGui::Render();
         glViewport(0, 0, (int)viewport->Size.x, (int)viewport->Size.y);

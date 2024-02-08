@@ -1,4 +1,5 @@
 #include <iostream>
+#include <thread>
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -7,26 +8,6 @@
 #include <GLFW/glfw3.h>
 #include "font.h"
 
-void SetupImGui(GLFWwindow* window) {
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    ImGui::StyleColorsDark();
-
-    // Modify ImGui style
-    ImGuiStyle& style = ImGui::GetStyle();
-    style.WindowRounding = 0.0f;
-    style.FrameRounding = 0.0f;
-    style.ScrollbarRounding = 0.0f;
-    style.ChildRounding = 0.0f;
-    style.GrabRounding = 0.0f;
-
-    io.Fonts->AddFontFromMemoryTTF(JetBrainsFont,sizeof(JetBrainsFont), 16.0f);
-
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 330");
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-}
 
 typedef struct {
     float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -39,7 +20,7 @@ void SwitchColor(float r, float g, float b, float alfa, int arrayIndex, Colors c
     colors[arrayIndex].color[3] = alfa;
 }
 
-void SettingsMenu(Colors colors[12],int& range, int& numberOfColors, bool& started) {
+void SettingsMenu(bool& started, Colors colors[12],int& range, int& numberOfColors) {
     ImGui::Begin("SetupGUI", nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
 
     ImGui::InputInt(" ", &range, NULL, NULL);
@@ -59,9 +40,10 @@ void SettingsMenu(Colors colors[12],int& range, int& numberOfColors, bool& start
     ImGui::End();
 }
 
-void RunTime() {
+void RunTime(bool& started) {
     ImGui::Begin("Running" ,nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
-    ImGui::Text("hello");
+    if (ImGui::Button("Stop"))
+        started = false;
     ImGui::End();
 }
 
@@ -76,6 +58,26 @@ bool ButtonCenteredOnLine(const char* label, float alignment = 0.5f)
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
 
     return ImGui::Button(label);
+}
+
+void BasarView(bool& started) {
+    if (!glfwInit())
+        return;
+
+    GLFWwindow* windowView = glfwCreateWindow(1200, 600, "Viewport", nullptr, nullptr);
+    if (!windowView) {
+        glfwTerminate();
+        return;
+    }
+
+    glfwMakeContextCurrent(windowView);
+
+    while (!glfwWindowShouldClose(windowView) && started) {
+        glClear(GL_COLOR_BUFFER_BIT);
+        glfwSwapBuffers(windowView);
+        glfwPollEvents();
+    }
+    glfwTerminate();
 }
 
 int main(void)
@@ -99,7 +101,26 @@ int main(void)
         return -1;
     }
     
-    SetupImGui(window);
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); 
+    (void)io;
+
+    ImGui::StyleColorsDark();
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.WindowRounding = 0.0f;
+    style.FrameRounding = 0.0f;
+    style.ScrollbarRounding = 0.0f;
+    style.ChildRounding = 0.0f;
+    style.GrabRounding = 0.0f;
+
+    io.Fonts->AddFontFromMemoryTTF(JetBrainsFont,sizeof(JetBrainsFont), 16.0f);
+
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+
     bool started = false;
     int range = 1000;
     // 8 farger: hvit, svart, lilla, gul, rød, blå, grønn, brun.
@@ -125,7 +146,15 @@ int main(void)
         ImGui::SetNextWindowSize(viewport->Size);
 
         // ImGui::ShowStyleEditor();
-        SettingsMenu(colors, range, numberOfColors, started);
+        if (!started) {
+            SettingsMenu(started, colors, range, numberOfColors);
+        }
+        else {
+            RunTime(started);     
+            // std::thread basarView(BasarView, std::ref(started));
+            // basarView.join();
+            // basarView.detach();
+        }
 
         ImGui::Render();
         glViewport(0, 0, (int)viewport->Size.x, (int)viewport->Size.y);

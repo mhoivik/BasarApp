@@ -39,6 +39,32 @@ void SwitchColor(float r, float g, float b, float alfa, int arrayIndex, Colors c
     colors[arrayIndex].color[3] = alfa;
 }
 
+void SettingsMenu(Colors colors[12],int& range, int& numberOfColors, bool& started) {
+    ImGui::Begin("SetupGUI", nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+
+    ImGui::InputInt(" ", &range, NULL, NULL);
+    ImGui::SliderInt("Antall Farger: ", &numberOfColors, 1, 12);
+
+    for (int i = 0; i < numberOfColors; ++i) {
+        ImGui::ColorEdit4(("Color " + std::to_string(i+1)).c_str(), colors[i].color, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoOptions);
+    }
+
+    if (ImGui::Button("START"))
+        started = true;
+
+    float fps = ImGui::GetIO().Framerate;
+    ImGui::Text("FPS: %.1f", fps);
+
+
+    ImGui::End();
+}
+
+void RunTime() {
+    ImGui::Begin("Running" ,nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+    ImGui::Text("hello");
+    ImGui::End();
+}
+
 bool ButtonCenteredOnLine(const char* label, float alignment = 0.5f)
 {
     ImGuiStyle& style = ImGui::GetStyle();
@@ -59,11 +85,12 @@ int main(void)
         return -1;
 
     GLFWwindow* window = glfwCreateWindow(640, 480, "Utøy Bedehus Basar App", NULL, NULL);
-    if (!window)
-    {
+
+    if (!window) {
         glfwTerminate();
         return -1;
     }
+
 
     glfwMakeContextCurrent(window);
     if (glewInit() != GLEW_OK) {
@@ -86,8 +113,7 @@ int main(void)
     SwitchColor(0.7f, 0.5f, 0.0f, 1.0f, 7, colors); // brun
     int numberOfColors = 1;
 
-    while (!glfwWindowShouldClose(window))
-    {
+    while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT);
 
         ImGui_ImplOpenGL3_NewFrame();
@@ -99,20 +125,7 @@ int main(void)
         ImGui::SetNextWindowSize(viewport->Size);
 
         // ImGui::ShowStyleEditor();
-
-        ImGui::Begin("SetupGUI", nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
-
-        ImGui::InputInt(" ", &range, NULL, NULL);
-        ImGui::SliderInt("Antall Farger: ", &numberOfColors, 1, 12);
-        for (int i = 0; i < numberOfColors; ++i) {
-            ImGui::ColorEdit4(("Color " + std::to_string(i+1)).c_str(), colors[i].color, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoOptions);
-        }
-        float fps = ImGui::GetIO().Framerate;
-        ImGui::Text("FPS: %.1f", fps);
-        if (ImGui::Button("START"))
-            started = true;
-
-        ImGui::End();
+        SettingsMenu(colors, range, numberOfColors, started);
 
         ImGui::Render();
         glViewport(0, 0, (int)viewport->Size.x, (int)viewport->Size.y);

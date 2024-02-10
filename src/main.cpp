@@ -8,6 +8,10 @@
 #include <GLFW/glfw3.h>
 #include "font.h"
 
+bool threadRunning= true;
+bool started = false;
+int range = 1000;
+std::thread basarViewThread;
 
 typedef struct {
     float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -20,7 +24,7 @@ void SwitchColor(float r, float g, float b, float alfa, int arrayIndex, Colors c
     colors[arrayIndex].color[3] = alfa;
 }
 
-void SettingsMenu(bool& started, Colors colors[12],int& range, int& numberOfColors) {
+void SettingsMenu(Colors colors[12],int& range, int& numberOfColors) {
     ImGui::Begin("SetupGUI", nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
 
     ImGui::InputInt(" ", &range, NULL, NULL);
@@ -40,10 +44,14 @@ void SettingsMenu(bool& started, Colors colors[12],int& range, int& numberOfColo
     ImGui::End();
 }
 
-void RunTime(bool& started) {
+void RunTime(GLFWwindow* windowView) {
     ImGui::Begin("Running" ,nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
-    if (ImGui::Button("Stop"))
+    if (ImGui::Button("Stop")) {
         started = false;
+        threadRunning = false;
+        basarViewThread.join();
+        glfwDestroyWindow(windowView);
+    }
     ImGui::End();
 }
 
@@ -60,24 +68,18 @@ bool ButtonCenteredOnLine(const char* label, float alignment = 0.5f)
     return ImGui::Button(label);
 }
 
-void BasarView(bool& started) {
-    if (!glfwInit())
-        return;
+void BasarView(GLFWwindow* window) {
+    while (threadRunning) {
 
-    GLFWwindow* windowView = glfwCreateWindow(1200, 600, "Viewport", nullptr, nullptr);
-    if (!windowView) {
-        glfwTerminate();
-        return;
+        glfwMakeContextCurrent(window);
+
+        while (started) {
+            glClear(GL_COLOR_BUFFER_BIT);
+            glfwSwapBuffers(window);
+            glfwPollEvents();
+        }
+
     }
-
-    glfwMakeContextCurrent(windowView);
-
-    while (!glfwWindowShouldClose(windowView) && started) {
-        glClear(GL_COLOR_BUFFER_BIT);
-        glfwSwapBuffers(windowView);
-        glfwPollEvents();
-    }
-    glfwTerminate();
 }
 
 int main(void)
@@ -87,12 +89,16 @@ int main(void)
         return -1;
 
     GLFWwindow* window = glfwCreateWindow(640, 480, "Utøy Bedehus Basar App", NULL, NULL);
-
     if (!window) {
         glfwTerminate();
         return -1;
     }
-
+    
+    GLFWwindow* windowView = glfwCreateWindow(1200, 600, "Viewport", nullptr, nullptr);
+    if (!windowView) {
+        glfwTerminate();
+        return -1;
+    }
 
     glfwMakeContextCurrent(window);
     if (glewInit() != GLEW_OK) {
@@ -121,8 +127,6 @@ int main(void)
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
 
-    bool started = false;
-    int range = 1000;
     // 8 farger: hvit, svart, lilla, gul, rød, blå, grønn, brun.
     SwitchColor(1.0f, 1.0f, 1.0f, 1.0f, 0, colors); // hvit/blank
     SwitchColor(0.0f, 0.0f, 0.0f, 0.0f, 1, colors); // svart(Her har vi et problem...)
@@ -133,6 +137,10 @@ int main(void)
     SwitchColor(0.0f, 1.0f, 0.0f, 1.0f, 6, colors); // grønn
     SwitchColor(0.7f, 0.5f, 0.0f, 1.0f, 7, colors); // brun
     int numberOfColors = 1;
+
+    basarViewThread = std::thread([windowView]() {
+            BasarView(windowView);
+            });
 
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT);
@@ -146,16 +154,13 @@ int main(void)
         ImGui::SetNextWindowSize(viewport->Size);
 
         // ImGui::ShowStyleEditor();
+
         if (!started) {
-            SettingsMenu(started, colors, range, numberOfColors);
+            SettingsMenu(colors, range,numberOfColors);
         }
         else {
-            RunTime(started);     
-            // std::thread basarView(BasarView, std::ref(started));
-            // basarView.join();
-            // basarView.detach();
+            RunTime(window);     
         }
-
         ImGui::Render();
         glViewport(0, 0, (int)viewport->Size.x, (int)viewport->Size.y);
 
@@ -163,7 +168,8 @@ int main(void)
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
+    started = false;
+    threadRunning= false;
     ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();

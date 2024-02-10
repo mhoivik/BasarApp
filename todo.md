@@ -1,6 +1,5 @@
 # left
 
-- Lag et vindu på en ny thread
 - Lag animasjoner i opengl
 - Senter appen
 - Gjør knappen større
@@ -11,11 +10,13 @@
 - Fjernstyring (local network) webapp?
 - Farger(bakgrunn og farge)
 - Samme tall kan trekkes flere ganger (ja eller nei)
+- Custom titlebar
 
 
 # started
 
 
+- Lag et vindu på en ny thread
 
 
 

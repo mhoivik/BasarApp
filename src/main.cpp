@@ -8,11 +8,9 @@
 #include <GLFW/glfw3.h>
 #include "font.h"
 
-bool threadRunning= true;
 bool started = false;
 int range = 1000;
-std::thread basarViewThread;
-
+GLFWwindow* windowView = nullptr;
 typedef struct {
     float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 } Colors;
@@ -22,6 +20,16 @@ void SwitchColor(float r, float g, float b, float alfa, int arrayIndex, Colors c
     colors[arrayIndex].color[1] = g;
     colors[arrayIndex].color[2] = b;
     colors[arrayIndex].color[3] = alfa;
+}
+
+
+void BasarView(GLFWwindow* windowView) {
+    
+    glClear(GL_COLOR_BUFFER_BIT);
+    glfwSwapBuffers(windowView);
+    glfwPollEvents();
+    if (!started)
+        glfwDestroyWindow(windowView);
 }
 
 void SettingsMenu(Colors colors[12],int& range, int& numberOfColors) {
@@ -34,8 +42,16 @@ void SettingsMenu(Colors colors[12],int& range, int& numberOfColors) {
         ImGui::ColorEdit4(("Color " + std::to_string(i+1)).c_str(), colors[i].color, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoOptions);
     }
 
-    if (ImGui::Button("START"))
+    if (ImGui::Button("START")) {
         started = true;
+        
+        windowView = glfwCreateWindow(1200, 600, "Viewport", nullptr, nullptr);
+        if (!windowView) {
+            glfwTerminate();
+            return;
+        }
+        glfwMakeContextCurrent(windowView);
+    }
 
     float fps = ImGui::GetIO().Framerate;
     ImGui::Text("FPS: %.1f", fps);
@@ -44,13 +60,12 @@ void SettingsMenu(Colors colors[12],int& range, int& numberOfColors) {
     ImGui::End();
 }
 
-void RunTime(GLFWwindow* windowView) {
+void RunTime(GLFWwindow* window) {
     ImGui::Begin("Running" ,nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
     if (ImGui::Button("Stop")) {
-        started = false;
-        threadRunning = false;
-        basarViewThread.join();
         glfwDestroyWindow(windowView);
+        windowView = nullptr;
+        started = false;
     }
     ImGui::End();
 }
@@ -68,22 +83,8 @@ bool ButtonCenteredOnLine(const char* label, float alignment = 0.5f)
     return ImGui::Button(label);
 }
 
-void BasarView(GLFWwindow* window) {
-    while (threadRunning) {
 
-        glfwMakeContextCurrent(window);
-
-        while (started) {
-            glClear(GL_COLOR_BUFFER_BIT);
-            glfwSwapBuffers(window);
-            glfwPollEvents();
-        }
-
-    }
-}
-
-int main(void)
-{
+int main(void) {
     Colors colors[12];
     if (!glfwInit())
         return -1;
@@ -93,14 +94,9 @@ int main(void)
         glfwTerminate();
         return -1;
     }
-    
-    GLFWwindow* windowView = glfwCreateWindow(1200, 600, "Viewport", nullptr, nullptr);
-    if (!windowView) {
-        glfwTerminate();
-        return -1;
-    }
 
     glfwMakeContextCurrent(window);
+
     if (glewInit() != GLEW_OK) {
         std::cerr << "init of glew failed!" << std::endl;
         glfwTerminate();
@@ -138,9 +134,6 @@ int main(void)
     SwitchColor(0.7f, 0.5f, 0.0f, 1.0f, 7, colors); // brun
     int numberOfColors = 1;
 
-    basarViewThread = std::thread([windowView]() {
-            BasarView(windowView);
-            });
 
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT);
@@ -156,20 +149,23 @@ int main(void)
         // ImGui::ShowStyleEditor();
 
         if (!started) {
-            SettingsMenu(colors, range,numberOfColors);
+            glfwMakeContextCurrent(window);
+            SettingsMenu(colors, range,numberOfColors); 
         }
         else {
-            RunTime(window);     
+            glfwMakeContextCurrent(windowView);
+            // BasarView(windowView);
+            glfwMakeContextCurrent(window);
+            RunTime(windowView); 
         }
         ImGui::Render();
         glViewport(0, 0, (int)viewport->Size.x, (int)viewport->Size.y);
 
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
     started = false;
-    threadRunning= false;
     ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();

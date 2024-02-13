@@ -10,6 +10,7 @@
 - Fjernstyring (local network) webapp?
 - Farger(bakgrunn og farge)
 - Samme tall kan trekkes flere ganger (ja eller nei)
+- Icon
 - Custom titlebar
 
 

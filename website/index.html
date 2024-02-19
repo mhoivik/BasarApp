@@ -1,61 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bizarre Applicaton</title>
-    <style>
-        body {
-            background-color: #343a40; /* Dark mode background color */
-            color: #ffffff; /* Text color */
-            text-align: center;
-            padding: 50px;
-            font-family: Arial, sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-        }
-        h1 {
-            font-weight: bold;
-            font-size: 100px;
-            color: #ffffff; /* Title color */
-            flex: 100%;
-        }
-        h2 {
-            color: #495057; /* Subtitle color */
-            flex: 100%;
-        }
-        img {
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            width: 50%;
-        }
-        a {
-            display: inline-block;
-            margin: 10px 0;
-            padding: 30px 60px;
-            background-color: #001d3d; /* Download link background color */
-            color: #ffffff; /* Download link text color */
-            text-decoration: none;
-            border-radius: 100px;
-            transition: background-color 0.3s ease;
-        }
-        a:hover {
-            background-color: #ffffff; /* Hover color */
-            color: #001d3d;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bizarre Application</title>
+  <style>
+    body {
+      background-color: #252525;
+      color: #ffffff;
+      text-align: center;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      margin: 0;
+      position: relative;
+    }
+
+    h1 {
+      text-align: center;
+      font-weight: bold;
+      font-size: 100px;
+      color: #ffffff;
+      transition: opacity 0.5s ease-in-out;
+    }
+
+    h2 {
+      color: #495057;
+    }
+
+    .image-container {
+      position: relative;
+      animation: shake 0.2s infinite; /* Less smooth and more aggressive */
+    }
+
+    @keyframes shake {
+      0%, 100% {
+        transform: translateX(0);
+      }
+      25%, 75% {
+        transform: translateX(5px); /* More aggressive movement */
+      }
+      50% {
+        transform: translateX(-5px); /* More aggressive movement */
+      }
+    }
+
+    img {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      width: 50%;
+      margin-top: 20px;
+    }
+
+    a {
+      display: inline-block;
+      margin: 10px 10px;
+      padding: 30px 60px;
+      background-color: #495057;
+      color: #ffffff;
+      text-decoration: none;
+      border-radius: 100px;
+      transition: background-color 0.3s ease;
+    }
+
+    a:hover {
+      background-color: #ffffff;
+      color: #001d3d;
+      animation: shake 0.2s infinite; /* Less smooth and more aggressive */
+    }
+  </style>
 </head>
 <body>
-    <h1>Bizarre</h1>
-    <h2>An open source bazaar applicaton</h2>
+  <h1 id="title">Bizarre</h1>
+  <h2>An open-source bazaar application</h2>
+  
+  <!-- Container for the image -->
+  <div class="image-container">
     <img src="BasarAppLogo.png" alt="Dark Mode Image">
-    <b>
-    <a href="download-link-windows.exe" download>Download for Windows</a>
+    
+    <!-- Confetti elements -->
+    <div class="confetti"></div>
+  </div>
+  
+  <b>
+    <a href="download-link-windows.exe"  download>Download for Windows</a>
     <a href="download-link-macos.dmg" download>Download for macOS</a>
     <a href="download-link-linux.tar.gz" download>Download for Linux</a>
-    </b>
+  </b>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      setTimeout(function() {
+        var title = document.getElementById("title");
+        title.classList.add("show");
+
+        // Start the aggressive shake animation after the title has faded in
+        var imageContainer = document.querySelector(".image-container");
+        imageContainer.style.animation = "shake 0.2s infinite";
+      }, 500);
+    });
+  </script>
 </body>
 </html>
+
